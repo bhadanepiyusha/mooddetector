@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mood Detector App</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Georgia", serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #f4f4f4;
+      color: #000;
+      padding: 20px;
+    }
+
+    .app {
+      max-width: 360px;
+      margin: auto;
+      background: #e2e2e2;
+      border-radius: 20px;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .emoji-list {
+      display: flex;
+      justify-content: space-around;
+      font-size: 2rem;
+      margin: 10px 0;
+    }
+
+    .emoji-list span {
+      cursor: pointer;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .emoji-list span.selected {
+      transform: scale(1.3);
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 15px 0;
+      font-family: Georgia, serif;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: white;
+      border-radius: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .calendar, .details {
+      margin-top: 30px;
+      background: #e2e2e2;
+      padding: 20px;
+      border-radius: 20px;
+    }
+
+    .calendar h3, .details h3 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .calendar table {
+      width: 100%;
+      text-align: center;
+      border-spacing: 5px;
+    }
+
+    .details p {
+      margin: 10px 0;
+    }
+
+    .dark-mode {
+      background-color: #3e3e3e;
+      color: #fff;
+    }
+
+    .toggle-mode {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #555;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <h2>How are you feeling today?</h2>
+    <div class="emoji-list" id="emojiList">
+      <span>😀</span>
+      <span>😐</span>
+      <span>😢</span>
+      <span>😠</span>
+    </div>
+    <textarea id="note" placeholder="Why are you feeling this way?"></textarea>
+    <button onclick="saveMood()">SAVE</button>
+
+    <div class="calendar">
+      <h3>Mood History</h3>
+      <p><strong>"July 2025"</strong></p>
+      <table>
+        <tr>
+          <td>S</td><td>M</td><td>T</td><td>W</td><td>T</td><td>F</td><td>S</td>
+        </tr>
+        <tr>
+          <td> </td><td> </td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td>
+        </tr>
+        <tr>
+          <td>6</td><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td>
+        </tr>
+        <!-- Add more weeks if needed -->
+      </table>
+    </div>
+
+    <div class="details" id="moodDetails">
+      <h3>Mood Details</h3>
+      <p><strong id="moodDate">July 6, 2025</strong></p>
+      <p>😊</p>
+      <p><strong>Note:</strong></p>
+      <p id="moodNote">Had a chill day.</p>
+      <p><small>Logged at: <span id="moodTime">10:45 AM</span></small></p>
+    </div>
+
+    <div class="toggle-mode" onclick="toggleMode()">[ Toggle Dark Mode ]</div>
+  </div>
+
+  <script>
+    let selectedEmoji = "";
+
+    const emojiList = document.getElementById("emojiList").children;
+    Array.from(emojiList).forEach((el) => {
+      el.addEventListener("click", () => {
+        Array.from(emojiList).forEach((e) => e.classList.remove("selected"));
+        el.classList.add("selected");
+        selectedEmoji = el.innerText;
+      });
+    });
+
+    function saveMood() {
+      const note = document.getElementById("note").value;
+      const now = new Date();
+      const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const date = now.toDateString();
+
+      if (!selectedEmoji) {
+        alert("Please select an emoji mood!");
+        return;
+      }
+
+      const moodData = {
+        emoji: selectedEmoji,
+        note,
+        time,
+        date
+      };
+
+      localStorage.setItem("mood", JSON.stringify(moodData));
+      displayMood();
+    }
+
+    function displayMood() {
+      const data = JSON.parse(localStorage.getItem("mood"));
+      if (data) {
+        document.getElementById("moodDate").innerText = data.date;
+        document.getElementById("moodNote").innerText = data.note;
+        document.getElementById("moodTime").innerText = data.time;
+        document.querySelector(".details p:nth-child(3)").innerText = data.emoji;
+      }
+    }
+
+    function toggleMode() {
+      document.getElementById("app").classList.toggle("dark-mode");
+    }
+
+    // On load
+    displayMood();
+  </script>
+</body>
+</html>
